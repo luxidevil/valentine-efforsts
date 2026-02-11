@@ -1,0 +1,162 @@
+{
+  "identity": {
+    "name": "The Digital Cupid",
+    "persona": "A modern romantic artisan who blends old-school love letters with digital magic.",
+    "tone": "Intimate, Magical, Playful, Sincere",
+    "aesthetic": "Soft Luxury Romance"
+  },
+  "typography": {
+    "font_family": {
+      "headings": "Playfair Display, serif",
+      "body": "Lato, sans-serif",
+      "script": "Great Vibes, cursive",
+      "accent": "Cormorant Garamond, serif"
+    },
+    "usage_rules": {
+      "headings": "Use Playfair Display for all main titles. Font weight: 700. Letter spacing: -0.02em.",
+      "body": "Use Lato for functional text and long descriptions. Font weight: 400. Line height: 1.6.",
+      "script": "Use Great Vibes for 'handwritten' notes, love poems, and signatures. Size must be at least 1.5x larger than body text for readability.",
+      "accent": "Use Cormorant Garamond for subtitles or emphasis. Italicized often looks best."
+    },
+    "google_fonts_import": "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+  },
+  "colors": {
+    "palette": {
+      "background": {
+        "main": "#FDFBF7",
+        "paper": "#F5F0E6",
+        "overlay": "rgba(253, 251, 247, 0.95)"
+      },
+      "primary": {
+        "main": "#9E2A2B",
+        "hover": "#7C1F20",
+        "text": "#590D0E"
+      },
+      "secondary": {
+        "main": "#E09F3E",
+        "soft": "#F4D35E"
+      },
+      "accent": {
+        "pink": "#FFD1DC",
+        "rose": "#E5989B",
+        "gold": "#D4AF37"
+      },
+      "neutral": {
+        "text_main": "#333333",
+        "text_muted": "#666666",
+        "border": "#E2E2E2"
+      }
+    },
+    "usage_rules": {
+      "backgrounds": "Avoid pure white (#FFFFFF). Use 'main' (#FDFBF7) for a warm, paper-like feel.",
+      "text": "Use 'primary.text' (#590D0E) for headings to give a deep red romantic feel, not black.",
+      "buttons": "Primary buttons should be 'primary.main' with white text. Secondary buttons can be 'accent.pink' with 'primary.text'.",
+      "gradients": "Use subtle gradients only. Example: 'bg-gradient-to-b from-[#FFF0F5] to-[#FDFBF7]'. Avoid harsh linear gradients."
+    }
+  },
+  "layout": {
+    "grid_system": {
+      "mobile": "grid-cols-1 gap-6 p-6",
+      "desktop": "grid-cols-12 gap-8 p-12 max-w-7xl mx-auto"
+    },
+    "spacing": {
+      "section_padding": "py-20 md:py-32",
+      "element_gap": "gap-6",
+      "container_padding": "p-6 md:p-10"
+    },
+    "containers": {
+      "card": "bg-white rounded-xl shadow-lg border border-[#E2E2E2] p-6 relative overflow-hidden",
+      "polaroid": "bg-white p-4 pb-12 shadow-md rotate-1 hover:rotate-0 transition-transform duration-300 ease-out border border-gray-100",
+      "glass": "bg-white/70 backdrop-blur-md border border-white/40 shadow-sm"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "rounded-full px-8 py-4 bg-[#9E2A2B] text-white font-serif font-bold tracking-wide shadow-lg hover:bg-[#7C1F20] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 active:scale-95",
+      "secondary": "rounded-full px-8 py-4 bg-[#FFD1DC] text-[#590D0E] font-serif font-bold hover:bg-[#E5989B] transition-all duration-300",
+      "ghost": "text-[#9E2A2B] hover:bg-[#FFF0F5] rounded-lg px-4 py-2 transition-colors"
+    },
+    "inputs": {
+      "mad_libs": "bg-transparent border-b-2 border-[#D4AF37] text-[#590D0E] font-serif text-xl focus:outline-none focus:border-[#9E2A2B] px-2 py-1 placeholder-[#E5989B] text-center w-full md:w-auto inline-block",
+      "standard": "w-full rounded-lg border border-[#E2E2E2] bg-white px-4 py-3 text-[#333333] focus:ring-2 focus:ring-[#FFD1DC] focus:border-[#9E2A2B] outline-none transition-all"
+    },
+    "cards": {
+      "interactive": "cursor-pointer relative overflow-hidden rounded-2xl shadow-xl transition-all duration-500 hover:shadow-2xl"
+    }
+  },
+  "motion": {
+    "library": "framer-motion",
+    "confetti_library": "canvas-confetti",
+    "principles": {
+      "softness": "Use spring animations with low stiffness and high damping for a 'floaty' feel.",
+      "stagger": "Always stagger children elements (0.1s delay) for lists or grids.",
+      "interaction": "All interactive elements must scale down slightly (0.95) on tap/click."
+    },
+    "presets": {
+      "fade_in_up": {
+        "initial": { "opacity": 0, "y": 20 },
+        "animate": { "opacity": 1, "y": 0 },
+        "transition": { "duration": 0.6, "ease": "easeOut" }
+      },
+      "heart_beat": {
+        "animate": { "scale": [1, 1.1, 1] },
+        "transition": { "repeat": "Infinity", "duration": 1.5 }
+      },
+      "flip": {
+        "initial": { "rotateY": 0 },
+        "animate": { "rotateY": 180 },
+        "transition": { "duration": 0.6 }
+      }
+    }
+  },
+  "visual_enhancers": {
+    "textures": {
+      "paper": "url('https://images.unsplash.com/photo-1706790608211-4c03fd4f4d33?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MTN8MHwxfHNlYXJjaHwxfHxwYXBlciUyMHRleHR1cmUlMjB2aW50YWdlfGVufDB8fHx8MTc3MDg0NzA2Nnww&ixlib=rb-4.1.0&q=85')",
+      "noise": "url('data:image/svg+xml,...') (Use a subtle noise SVG if possible)"
+    },
+    "decorations": {
+      "rose_petals": "Floating elements using absolute positioning and parallax.",
+      "gold_dust": "Small yellow/gold circles with blur effects."
+    },
+    "images": {
+      "hero_couple": "https://images.unsplash.com/photo-1658851866325-49fb8b7fbcb2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwxfHxyb21hbnRpYyUyMGNvdXBsZSUyMHN1bnNldHxlbnwwfHx8fDE3NzA4NDcwNjV8MA&ixlib=rb-4.1.0&q=85",
+      "rose_petals": "https://images.unsplash.com/photo-1571506534699-c76894c03ce7?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1ODR8MHwxfHNlYXJjaHwxfHxyZWQlMjByb3NlJTIwcGV0YWxzfGVufDB8fHx8MTc3MDg0NzA3MXww&ixlib=rb-4.1.0&q=85",
+      "paper_texture": "https://images.unsplash.com/photo-1706790608211-4c03fd4f4d33?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MTN8MHwxfHNlYXJjaHwxfHxwYXBlciUyMHRleHR1cmUlMjB2aW50YWdlfGVufDB8fHx8MTc3MDg0NzA2Nnww&ixlib=rb-4.1.0&q=85"
+    }
+  },
+  "accessibility": {
+    "contrast": "Ensure text on colored backgrounds meets WCAG AA. Use dark red (#590D0E) on pink backgrounds, not white.",
+    "reduced_motion": "Respect 'prefers-reduced-motion'. Disable auto-playing animations if set.",
+    "aria_labels": "All interactive elements (hearts, scratch cards) must have descriptive aria-labels."
+  },
+  "testing": {
+    "attribute": "data-testid",
+    "format": "kebab-case",
+    "examples": [
+      "hero-cta-button",
+      "photo-upload-input",
+      "poem-generate-button",
+      "card-flip-interaction"
+    ]
+  },
+  "universal_guidelines": {
+    "do_not": [
+      "Do not use generic 'alert' or 'confirm' boxes. Use custom romantic modals.",
+      "Do not use default scrollbars. Style them thin and pink.",
+      "Do not use 'Inter' font for headings.",
+      "Do not use pure black (#000000). Use #333333 or #590D0E."
+    ],
+    "must_do": [
+      "Always add a 'hover' state to interactive elements.",
+      "Use 'cursor-pointer' on anything clickable.",
+      "Ensure the 'Back' button is always visible in the creation flow."
+    ]
+  },
+  "instructions_to_main_agent": {
+    "step_1": "Install dependencies: framer-motion, canvas-confetti, lucide-react, clsx, tailwind-merge.",
+    "step_2": "Update tailwind.config.js to include the new color palette and font families.",
+    "step_3": "Create the 'Mad Libs' style input component first, as it's core to the 'About Her' section.",
+    "step_4": "Implement the 'ScratchCard' component using HTML5 Canvas API.",
+    "step_5": "Ensure the 'Share' functionality generates a unique URL (mocked or real)."
+  }
+}

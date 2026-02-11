@@ -91,10 +91,15 @@ const ViewCard = () => {
     }
   };
 
-  const copyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    toast.success("Link copied!");
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      toast.success("Link copied!");
+    } catch (error) {
+      // Fallback: show the link in a toast for manual copy
+      toast.info(`Share this link: ${window.location.href}`, { duration: 5000 });
+    }
     setTimeout(() => setCopied(false), 2000);
   };
 

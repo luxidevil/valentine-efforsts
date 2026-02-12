@@ -7,15 +7,18 @@ import CardCreator from "./pages/CardCreator";
 import ViewCard from "./pages/ViewCard";
 
 const CustomBadge = () => (
-  <div
-    className="fixed bottom-4 right-4 z-[10000] flex items-center gap-2 px-4 py-2 rounded-full bg-valentine-primary text-white font-lato text-sm shadow-lg"
+  <a
+    href="https://www.linkedin.com/in/kushal-gupta-77949118a/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="fixed bottom-4 right-4 z-[10000] flex items-center gap-2 px-4 py-2 rounded-full bg-valentine-primary text-white font-lato text-sm shadow-lg hover:bg-valentine-primary-hover hover:scale-105 transition-all cursor-pointer"
     style={{ zIndex: 10000 }}
   >
     <span>made by</span>
     <span className="font-bold">luxuriousdevil</span>
     <span>with</span>
     <Heart size={14} fill="currentColor" className="text-valentine-pink" />
-  </div>
+  </a>
 );
 
 function App() {

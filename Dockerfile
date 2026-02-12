@@ -4,6 +4,10 @@
 # Stage 1: Build Frontend
 FROM node:20-alpine as frontend-build
 
+
+RUN yarn config set registry https://registry.npmjs.org && \
+    yarn config set network-timeout 600000 -g
+
 WORKDIR /frontend
 
 COPY frontend/package.json frontend/yarn.lock ./
@@ -73,5 +77,3 @@ EXPOSE 80
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
 
 
-RUN yarn config set registry https://registry.npmjs.org && \
-    yarn config set network-timeout 600000 -g

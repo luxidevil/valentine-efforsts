@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7
+    container_name: valentine-mongodb
+    restart: unless-stopped
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - valentine-network
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: valentine-backend
+    restart: unless-stopped
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017
+      - DB_NAME=valentine_cards
+      - CORS_ORIGINS=*
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    ports:
+      - "8001:8001"
+    depends_on:
+      - mongodb
+    networks:
+      - valentine-network
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_BACKEND_URL=${REACT_APP_BACKEND_URL:-http://localhost:8001}
+    container_name: valentine-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - valentine-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  valentine-network:
+    driver: bridge

@@ -3,15 +3,16 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install dependencies
+# Install python deps
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy backend code
 COPY . .
 
-# Expose port
-EXPOSE 8001
+# Cloud Run uses PORT env var (usually 8080)
+ENV PORT=8080
+EXPOSE 8080
 
-# Run the application
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8001"]
+# If your FastAPI app is backend.server:app (as you used earlier)
+CMD ["sh", "-c", "uvicorn server:app --host 0.0.0.0 --port ${PORT}"]

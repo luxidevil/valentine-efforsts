@@ -1,0 +1,27 @@
+steps:
+  # Build image
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "$_IMAGE", "."]
+
+  # Push image
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "$_IMAGE"]
+
+  # Deploy to Cloud Run
+  - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      [
+        "run","deploy","$_SERVICE",
+        "--image","$_IMAGE",
+        "--region","$_REGION",
+        "--platform","managed",
+        "--allow-unauthenticated"
+      ]
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _REGION: "asia-south1"
+  _SERVICE: "valentine-backend"
+  _IMAGE: "asia-south1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/valentine-backend:$SHORT_SHA"

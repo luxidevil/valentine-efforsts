@@ -71,3 +71,7 @@ autorestart=true \n\
 EXPOSE 80
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
+
+
+RUN yarn config set registry https://registry.npmjs.org && \
+    yarn config set network-timeout 600000 -g

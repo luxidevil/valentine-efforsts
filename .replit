@@ -4,3 +4,46 @@ expertMode = true
 
 [nix]
 channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+REACT_APP_BACKEND_URL = "https://050fc4cb-bd34-46be-99ba-7e06ba6aabb1-00-1dx6r84dxz1r7.pike.replit.dev"
+DB_NAME = "valentine_cards"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /home/runner/workspace && python -m uvicorn backend.server:app --host localhost --port 8000 & cd /home/runner/workspace/frontend && PORT=5000 HOST=0.0.0.0 npx craco start"
+waitForPort = 5000
+
+[[ports]]
+localPort = 3000
+externalPort = 3000
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[deployment]
+deploymentTarget = "vm"
+run = ["bash", "-c", "cd /home/runner/workspace && python -m uvicorn backend.server:app --host 0.0.0.0 --port 5000"]
+build = ["bash", "-c", "cd /home/runner/workspace/frontend && npm run build"]

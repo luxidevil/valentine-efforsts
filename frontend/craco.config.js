@@ -6,10 +6,9 @@ require("dotenv").config();
 // Craco sets NODE_ENV=development for start, NODE_ENV=production for build
 const isDevServer = process.env.NODE_ENV !== "production";
 
-// Environment variable overrides
 const config = {
   enableHealthCheck: process.env.ENABLE_HEALTH_CHECK === "true",
-  enableVisualEdits: isDevServer, // Only enable during dev server
+  enableVisualEdits: false,
 };
 
 // Conditionally load visual edits modules only in dev mode
@@ -78,6 +77,17 @@ if (config.enableVisualEdits && babelMetadataPlugin) {
 }
 
 webpackConfig.devServer = (devServerConfig) => {
+  devServerConfig.port = 5000;
+  devServerConfig.host = '0.0.0.0';
+  devServerConfig.allowedHosts = 'all';
+  devServerConfig.proxy = [
+    {
+      context: ['/api'],
+      target: 'http://localhost:8000',
+      changeOrigin: true,
+    },
+  ];
+
   // Apply visual edits dev server setup only if enabled
   if (config.enableVisualEdits && setupDevServer) {
     devServerConfig = setupDevServer(devServerConfig);

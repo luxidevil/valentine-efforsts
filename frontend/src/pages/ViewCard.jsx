@@ -11,8 +11,7 @@ import ScratchCard from "../components/ScratchCard";
 import FlipCard from "../components/FlipCard";
 import LoveNoteReveal from "../components/LoveNoteReveal";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+const API = "/api";
 
 const ViewCard = () => {
   const { cardId } = useParams();

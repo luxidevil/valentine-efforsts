@@ -5,6 +5,8 @@ import { Heart } from "lucide-react";
 import LandingPage from "./pages/LandingPage";
 import CardCreator from "./pages/CardCreator";
 import ViewCard from "./pages/ViewCard";
+import LetterCreator from "./pages/LetterCreator";
+import ViewLetter from "./pages/ViewLetter";
 
 const CustomBadge = () => (
   <a
@@ -29,6 +31,8 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/create" element={<CardCreator />} />
           <Route path="/card/:cardId" element={<ViewCard />} />
+          <Route path="/letter/create" element={<LetterCreator />} />
+          <Route path="/letter/:letterId" element={<ViewLetter />} />
         </Routes>
       </BrowserRouter>
       <Toaster position="top-center" richColors />

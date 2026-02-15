@@ -65,6 +65,37 @@ class GeneratedContent(BaseModel):
     scratch_message: str
 
 
+class LetterCreate(BaseModel):
+    letter_type: str
+    recipient_name: str
+    sender_name: str
+    context: str
+    custom_prompt: Optional[str] = None
+    tone: Optional[str] = "romantic"
+    photos: Optional[List[str]] = []
+    template: Optional[str] = "classic"
+    font: Optional[str] = "playfair"
+    color_scheme: Optional[str] = "romantic-red"
+
+
+class LetterResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    id: str
+    letter_type: str
+    recipient_name: str
+    sender_name: str
+    context: str
+    custom_prompt: Optional[str] = None
+    tone: str
+    photos: List[str]
+    content: str
+    template: str
+    font: str
+    color_scheme: str
+    created_at: str
+
+
 async def generate_romantic_content(girlfriend_name: str, description: str, sender_name: str) -> GeneratedContent:
     last_error = None
     for api_key in API_KEYS:
@@ -143,6 +174,76 @@ Forever yours, {sender_name}""",
     )
 
 
+async def generate_letter_content(letter_type: str, recipient_name: str, sender_name: str, context: str, tone: str, custom_prompt: Optional[str] = None) -> str:
+    type_instructions = {
+        "love": f"Write a deeply romantic and passionate love letter from {sender_name} to {recipient_name}. Make it heartfelt, intimate, and emotionally powerful.",
+        "sorry": f"Write a sincere, heartfelt apology letter from {sender_name} to {recipient_name}. They had a fight/disagreement about: {context}. Acknowledge the hurt caused, take responsibility, express genuine remorse, and promise to do better. Be vulnerable and honest.",
+        "proposal": f"Write an unforgettable marriage proposal letter from {sender_name} to {recipient_name}. Make it deeply personal, emotional, and build up to the magical question. Reference their journey together.",
+        "anniversary": f"Write a beautiful anniversary letter from {sender_name} to {recipient_name}. Celebrate their time together, reminisce about beautiful moments, and look forward to the future.",
+        "miss-you": f"Write an emotionally touching 'I miss you' letter from {sender_name} to {recipient_name}. Express how much they miss them, what they miss most, and how they can't wait to be together again.",
+        "first-love": f"Write a sweet and innocent first love confession letter from {sender_name} to {recipient_name}. Capture the butterflies, nervousness, and pure joy of falling in love for the first time.",
+        "long-distance": f"Write a heartfelt long-distance relationship letter from {sender_name} to {recipient_name}. Express how distance makes the heart grow fonder, share dreams of being together, and reassure your love.",
+        "custom": f"Write a personalized letter from {sender_name} to {recipient_name} based on these instructions: {custom_prompt or context}",
+    }
+
+    type_instruction = type_instructions.get(letter_type, type_instructions["love"])
+
+    tone_map = {
+        "romantic": "deeply romantic, passionate, and sensual",
+        "poetic": "lyrical, metaphor-rich, and beautifully poetic like a piece of literature",
+        "funny": "witty, playful, and humorous while still being loving and sweet",
+        "emotional": "raw, vulnerable, and deeply emotional - pull at heartstrings",
+        "casual": "warm, genuine, and conversational like talking to your best friend who you love",
+        "dramatic": "grand, theatrical, and over-the-top romantic like a movie scene",
+    }
+
+    tone_desc = tone_map.get(tone, tone_map["romantic"])
+
+    last_error = None
+    for api_key in API_KEYS:
+        try:
+            gemini_client = genai.Client(api_key=api_key)
+
+            system_instruction = f"""You are a world-class letter writer who creates deeply personal, beautifully written letters.
+Your tone should be {tone_desc}.
+Write in a natural, flowing style with proper paragraphs.
+Do NOT include any JSON formatting, code blocks, or markdown.
+Just write the pure letter content with proper paragraphs.
+Do NOT include "Dear..." or sign-off like "Love, name" - those will be added separately.
+The letter should be 3-5 paragraphs long, each paragraph being meaningful and personal."""
+
+            prompt = f"""{type_instruction}
+
+Context/Details about them and their relationship: {context}
+
+{f"Additional custom instructions: {custom_prompt}" if custom_prompt else ""}
+
+Write a beautiful, {tone_desc} letter. Make it personal and reference the specific details provided. 3-5 paragraphs."""
+
+            response = gemini_client.models.generate_content(
+                model="gemini-2.0-flash",
+                contents=prompt,
+                config=genai.types.GenerateContentConfig(
+                    system_instruction=system_instruction,
+                ),
+            )
+
+            return response.text.strip()
+        except Exception as e:
+            last_error = e
+            logger.warning(f"API key failed for letter generation, trying next: {e}")
+            continue
+
+    logger.error(f"All API keys failed for letter. Last error: {last_error}")
+    return f"""Every moment I spend thinking about you fills my heart with a warmth that words can barely capture. You are the most extraordinary person I have ever known, and I find myself falling deeper in love with you with each passing day.
+
+{context}
+
+There are a thousand things I want to say to you, and yet when I try to put them into words, I realize that no language was ever designed to hold this much love. You deserve the world and more, and I promise to spend every day trying to give it to you.
+
+You are my today, my tomorrow, and my forever. Nothing in this world compares to the joy of loving you and being loved by you in return."""
+
+
 @app.on_event("startup")
 async def startup():
     global db_pool
@@ -160,6 +261,23 @@ async def startup():
                         poem TEXT NOT NULL DEFAULT '',
                         love_notes TEXT NOT NULL DEFAULT '[]',
                         scratch_message TEXT NOT NULL DEFAULT '',
+                        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+                    )
+                """)
+                await conn.execute("""
+                    CREATE TABLE IF NOT EXISTS love_letters (
+                        id VARCHAR(36) PRIMARY KEY,
+                        letter_type VARCHAR(50) NOT NULL,
+                        recipient_name VARCHAR(255) NOT NULL,
+                        sender_name VARCHAR(255) NOT NULL,
+                        context TEXT NOT NULL DEFAULT '',
+                        custom_prompt TEXT,
+                        tone VARCHAR(50) NOT NULL DEFAULT 'romantic',
+                        photos TEXT NOT NULL DEFAULT '[]',
+                        content TEXT NOT NULL DEFAULT '',
+                        template VARCHAR(50) NOT NULL DEFAULT 'classic',
+                        font VARCHAR(50) NOT NULL DEFAULT 'playfair',
+                        color_scheme VARCHAR(50) NOT NULL DEFAULT 'romantic-red',
                         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
                     )
                 """)
@@ -246,6 +364,86 @@ async def get_card(card_id: str):
         poem=row["poem"],
         love_notes=json.loads(row["love_notes"]),
         scratch_message=row["scratch_message"],
+        created_at=row["created_at"].isoformat()
+    )
+
+
+@api_router.post("/letters", response_model=LetterResponse)
+async def create_letter(letter_data: LetterCreate):
+    if db_pool is None:
+        raise HTTPException(status_code=503, detail="Database not configured.")
+    try:
+        content = await generate_letter_content(
+            letter_data.letter_type,
+            letter_data.recipient_name,
+            letter_data.sender_name,
+            letter_data.context,
+            letter_data.tone or "romantic",
+            letter_data.custom_prompt
+        )
+
+        letter_id = str(uuid.uuid4())
+        created_at = datetime.now(timezone.utc).isoformat()
+        photos_json = json.dumps(letter_data.photos or [])
+
+        async with db_pool.acquire() as conn:
+            await conn.execute(
+                """INSERT INTO love_letters (id, letter_type, recipient_name, sender_name, context, custom_prompt, tone, photos, content, template, font, color_scheme, created_at)
+                   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)""",
+                letter_id, letter_data.letter_type, letter_data.recipient_name,
+                letter_data.sender_name, letter_data.context,
+                letter_data.custom_prompt or "", letter_data.tone or "romantic",
+                photos_json, content, letter_data.template or "classic",
+                letter_data.font or "playfair", letter_data.color_scheme or "romantic-red",
+                datetime.now(timezone.utc)
+            )
+
+        return LetterResponse(
+            id=letter_id,
+            letter_type=letter_data.letter_type,
+            recipient_name=letter_data.recipient_name,
+            sender_name=letter_data.sender_name,
+            context=letter_data.context,
+            custom_prompt=letter_data.custom_prompt,
+            tone=letter_data.tone or "romantic",
+            photos=letter_data.photos or [],
+            content=content,
+            template=letter_data.template or "classic",
+            font=letter_data.font or "playfair",
+            color_scheme=letter_data.color_scheme or "romantic-red",
+            created_at=created_at
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating letter: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.get("/letters/{letter_id}", response_model=LetterResponse)
+async def get_letter(letter_id: str):
+    if db_pool is None:
+        raise HTTPException(status_code=503, detail="Database not configured.")
+
+    async with db_pool.acquire() as conn:
+        row = await conn.fetchrow("SELECT * FROM love_letters WHERE id = $1", letter_id)
+
+    if not row:
+        raise HTTPException(status_code=404, detail="Letter not found")
+
+    return LetterResponse(
+        id=row["id"],
+        letter_type=row["letter_type"],
+        recipient_name=row["recipient_name"],
+        sender_name=row["sender_name"],
+        context=row["context"],
+        custom_prompt=row["custom_prompt"] if row["custom_prompt"] else None,
+        tone=row["tone"],
+        photos=json.loads(row["photos"]),
+        content=row["content"],
+        template=row["template"],
+        font=row["font"],
+        color_scheme=row["color_scheme"],
         created_at=row["created_at"].isoformat()
     )
 

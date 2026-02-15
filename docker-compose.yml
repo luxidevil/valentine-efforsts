@@ -1,56 +1,40 @@
 version: '3.8'
 
 services:
-  # MongoDB Database
-  mongodb:
-    image: mongo:7
-    container_name: valentine-mongodb
-    restart: unless-stopped
-    volumes:
-      - mongodb_data:/data/db
-    ports:
-      - "27017:27017"
-    networks:
-      - valentine-network
-
-  # FastAPI Backend
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: valentine-backend
+  db:
+    image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      - MONGO_URL=mongodb://mongodb:27017
-      - DB_NAME=valentine_cards
-      - CORS_ORIGINS=*
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      POSTGRES_USER: valentine
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-valentine_secret}
+      POSTGRES_DB: valentine_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     ports:
-      - "8001:8001"
-    depends_on:
-      - mongodb
-    networks:
-      - valentine-network
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U valentine -d valentine_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  # React Frontend
-  frontend:
+  app:
     build:
-      context: ./frontend
+      context: .
       dockerfile: Dockerfile
-      args:
-        - REACT_APP_BACKEND_URL=${REACT_APP_BACKEND_URL:-http://localhost:8001}
-    container_name: valentine-frontend
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgresql://valentine:${POSTGRES_PASSWORD:-valentine_secret}@db:5432/valentine_db
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GOOGLE_API_KEY1=${GOOGLE_API_KEY1:-}
+      - GOOGLE_API_KEY2=${GOOGLE_API_KEY2:-}
+      - GOOGLE_API_KEY3=${GOOGLE_API_KEY3:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
     depends_on:
-      - backend
-    networks:
-      - valentine-network
+      db:
+        condition: service_healthy
 
 volumes:
-  mongodb_data:
-
-networks:
-  valentine-network:
-    driver: bridge
+  postgres_data:

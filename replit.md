@@ -57,10 +57,20 @@ build.sh          - Build script for deployment
 - `GOOGLE_API_KEY2` - Backup API key 2 (secret)
 
 ## Deployment
+
+### Replit
 - **Build**: `bash build.sh` (installs Python deps from requirements.txt, builds React frontend)
 - **Run**: `python -m uvicorn backend.server:app --host 0.0.0.0 --port 5000`
 - **Type**: Autoscale deployment
 - **Domain**: valentine-efforts.space (Namecheap DNS with A record to 34.111.179.208)
+
+### Docker / GCP
+- **Dockerfile**: Multi-stage build (Node 20 for frontend, Python 3.11 for backend)
+- **docker-compose.yml**: App + PostgreSQL 16 with health checks
+- **Run locally**: `docker compose up --build` (app on port 8080)
+- **GCP Cloud Run**: Build and push image, set DATABASE_URL and GOOGLE_API_KEY env vars
+- **GCP port**: 8080 (Cloud Run default)
+- **Env vars needed**: See `.env.example`
 
 ## Recent Changes
 - 2026-02-15: Added Love Letter Creator feature

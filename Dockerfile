@@ -1,9 +1,9 @@
-FROM node:20-slim AS frontend-build
+FROM node:20 AS frontend-build
 
 WORKDIR /app/frontend
 
-COPY frontend/package.json frontend/package-lock.json* ./
-RUN npm ci --production=false
+COPY frontend/package.json ./
+RUN npm install --legacy-peer-deps
 
 COPY frontend/ ./
 RUN npm run build
